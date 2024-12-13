@@ -13,7 +13,7 @@ using Doc_Tracking_vl.Models;
 namespace Doc_Tracking_vl.Controllers.HeadOffice
 {
     [SessionTimeout]
-
+    //ghdgsjhgjh
     public class Head_OfficeController : Controller
     {
 
