@@ -1,0 +1,248 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+
+    Layout = null;
+
+}
+@*<img src="~/Assets/images/image-gallery/thumb/1-removebg-preview.png" />*@
+
+
+
+@*<img src="~/Assets/images/image-gallery/HD-wallpaper-digital-signature.jpg" />*@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @@import url(https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,700);
+@@import url(//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css);
+
+body, html {
+  height: 100%;
+}
+body {
+  font-family: 'Open Sans';
+  font-weight: 100;
+  display: flex;
+  overflow: hidden;
+}
+input {
+  ::-webkit-input-placeholder {
+     color: rgba(255,255,255,0.7);
+  }
+  ::-moz-placeholder {
+     color: rgba(255,255,255,0.7);
+  }
+  :-ms-input-placeholder {
+     color: rgba(255,255,255,0.7);
+  }
+  &:focus {
+    outline: 0 transparent solid;
+    ::-webkit-input-placeholder {
+     color: rgba(0,0,0,0.7);
+    }
+    ::-moz-placeholder {
+       color: rgba(0,0,0,0.7);
+    }
+    :-ms-input-placeholder {
+       color: rgba(0,0,0,0.7);
+    }
+  }
+}
+
+.login-form {
+  background: #222;
+  box-shadow: 0 0 1rem rgba(0,0,0,0.3);
+  min-height: 17rem;
+  margin: auto;
+  max-width: 80%;
+  padding: 1rem;
+  border-radius: 10px;
+  opacity:1 ;
+}
+.login-text {
+  /* background: hsl(40,30,60);
+  border-bottom: .5rem solid white; */
+  color: white;
+  font-size: 1.5rem;
+  margin: 0 auto;
+  max-width: 50%;
+  padding: .5rem;
+  text-align: center;
+  /* //text-shadow: 1px -1px 0 rgba(0,0,0,0.3); */
+  .fa-stack-1x {
+    color: black;
+  }
+}
+
+.login-username, .login-password {
+  background: transparent;
+  border: 0 solid;
+  border-bottom: 1px solid rgba(white, .5);
+  color: white;
+  display: block;
+  margin: 1rem;
+  padding: .5rem;
+  transition: 250ms background ease-in;
+  width: calc(100% - 3rem);
+  &:focus {
+    background: white;
+    color: black;
+    transition: 250ms background ease-in;
+  }
+}
+
+.login-forgot-pass {
+  /* //border-bottom: 1px solid white; */
+  bottom: 0;
+  color: white;
+  cursor: pointer;
+  display: block;
+  font-size: 75%;
+  left: 0;
+  opacity: 0.6;
+  padding: .5rem;
+  position: absolute;
+  text-align: center;
+  /* //text-decoration: none; */
+  width: 100%;
+  &:hover {
+    opacity: 1;
+  }
+}
+.login-submit {
+  border: 1px solid white;
+  background: transparent;
+  color: white;
+  display: block;
+  margin: 1rem auto;
+  width: 100px;
+  height:30px;
+  padding: .25rem;
+  transition: 250ms background ease-in;
+  &:hover, &:focus {
+    background: white;
+    color: black;
+    transition: 250ms background ease-in;
+  }
+}
+        .custom-image {
+            position: absolute; /* Position the image absolutely within the stack */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust to the exact center */
+            width: 70%; /* Increase size to better fit within the circle */
+            height: 70%; /* Keep the aspect ratio consistent */
+            object-fit: contain; /* Ensures the image maintains its aspect ratio without distortion */
+            border-radius: 50%; /* Makes the image circular */
+            z-index: 2; /* Ensures the image appears above the circle */
+        }
+
+        .fa-stack {
+            position: relative;
+            display: inline-block;
+        }
+
+        .fa-circle {
+            z-index: 1; /* Places the circle behind the image */
+            color: #f0f0f0; /* Adjust color if needed to better contrast with the image */
+        }
+
+
+[class*=underlay] {
+  left: 0;
+  min-height: 100%;
+  min-width: 100%;
+  position: fixed;
+  top: 0;
+}
+
+
+
+
+
+
+        .underlay-photo { /*
+            animation: hue-rotate 6s infinite;*/
+            /*   background-image: url('~/Assets/images/image-gallery/HD-wallpaper-digital-signature.jpg');
+*/
+          /*  background-image: url('../../assets/images/image-gallery/pexels-leeloothefirst-5561913.jpg');*/
+            background-image: linear-gradient(to bottom, #574b52, #665c65, #756e78, #84818c, #94949f, #9ca0ad, #a4adba, #abbac7, #abc4d0, #abcdd6, #acd7da, #b1e0db);
+            /*  background-image: linear-gradient(to bottom, #574b52, #665c65, #756e78, #84818c, #94949f, #9ca0ad, #a4adba, #abbac7, #abc4d0, #abcdd6, #acd7da, #b1e0db);*/
+            background-color: #bdbdbd; /* Light gray fallback color */
+            /*background-image: linear-gradient(to right, #e0e0e0, #4a4a4a);*/
+            /* background-image: url('../../assets/images/image-gallery/hd-wallpaper-digital-signature.jpg');*/
+            /*background-image:src(../../Assets/images/image-gallery/HD-wallpaper-digital-signature.jpg);*/
+            /*-webkit-filter: grayscale(30%);*/
+
+
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: cover;
+            /* -webkit-filter: grayscale(30%); */
+        }
+.underlay-black {
+ /* background: rgba(0,0,0,0.7);*/
+  z-index: -1;
+}
+
+@*@keyframes hue-rotate {
+  from {
+    -webkit-filter: grayscale(30%) hue-rotate(0deg);
+  }
+  to {
+    -webkit-filter: grayscale(30%) hue-rotate(360deg);
+  }
+} */*@
+    </style>
+</head>
+<body>
+    <form action="@Url.Action("Login", "Login")" method="post" class="login-form">
+        <p class="login-text">
+            <span class="fa-stack fa-lg">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-lock fa-stack-1x"></i>
+                <img src="~/Assets/images/image-gallery/thumb/1-removebg-preview.png" class="fa-stack-1x custom-image" alt="Custom Image" />
+
+            </span>
+        </p>
+        <input type="text" class="login-username" autofocus="true" required="true" id="Userid" name="Userid" placeholder="Employee Code" maxlength="6" />
+        <input type="password" class="login-password" required="true" id="PassWord" name="PassWord" placeholder="Password" />
+        <input type="submit" name="Login" value="Login" class="btn login-submit" />
+    </form>
+
+
+    @*@if (TempData["Message"] != null)
+        {
+            <div id="alert" class="alert alert-success">
+                @TempData["Message"]
+            </div>
+        }*@
+    @*<a href="#" class="login-forgot-pass">forgot password?</a>*@
+    <div class="underlay-photo"></div>
+    <div class="underlay-black"></div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Function to fade out the alert message after 10 seconds
+            setTimeout(function () {
+                $('#alert').fadeOut('fast');
+            }, 3000); // 10 seconds in milliseconds (1000 ms = 1 second)
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

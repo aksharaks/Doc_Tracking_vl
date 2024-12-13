@@ -1,0 +1,87 @@
+﻿
+@model Doc_Tracking_vl.Models.SettleFormModel
+
+
+@using (Html.BeginForm("SaveDetails", "Settlement_HO", FormMethod.Post, new { enctype = "multipart/form-data", id = "settleForm" }))
+{
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Document List ID</th>
+                    <th>List Items</th>
+                    <th>Is Checked</th>
+                    <th>Details</th>
+                    <th>Upload</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.DirectDocs.Count; i++)
+                {
+                    <tr class="filerow">
+                        <td>@(i + 1)</td>
+                        <td>@Html.HiddenFor(m => m.DirectDocs[i].ListItems) @Model.DirectDocs[i].ListItems</td>
+                        <td>
+                            <div class="form-check form-check-inline">
+                                @Html.RadioButtonFor(m => m.DirectDocs[i].IsChecked, true, new { id = "PDYes_" + Model.DirectDocs[i].DocListId })
+                                <label class="form-check-label" for="PDYes_@Model.DirectDocs[i].DocListId"> Yes</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                @Html.RadioButtonFor(m => m.DirectDocs[i].IsChecked, false, new { id = "PDNo_" + Model.DirectDocs[i].DocListId })
+                                <label class="form-check-label" for="PDNo_@Model.DirectDocs[i].DocListId"> No</label>
+                            </div>
+                        </td>
+                        <td>
+
+                            @if (Model.DirectDocs[i].DocListId == "4")
+                            {
+                                @Html.TextBoxFor(m => m.DirectDocs[i].CourierConsignmentNo)
+                            }
+                            @*else if (Model.CourDocs[i].DocListId == "5")
+                                {
+                                    @Html.TextBoxFor(m => m.CourDocs[i].BranchName, new { @readonly = "readonly", @value = Model.CourDocs[i].BranchName })
+                                }*@
+
+                            else if (Model.DirectDocs[i].DocListId == "2")
+                            {
+                                @Html.TextBoxFor(m => m.DirectDocs[i].handoverto)
+                            }
+                            else if (Model.DirectDocs[i].DocListId == "3")
+                            {
+                                <!-- Use HTML5 date input -->
+                                <input type="date" name="CourDocs[@i].CourierDate" class="datepicker" />
+                            }
+                            else
+                            {
+                                <!-- Empty cell for document list IDs 3 and 4 -->
+                            }
+                        </td>
+                        <td>
+                            <!-- File upload input -->
+                            <input type="file" name="CourDocs[@i].ImageFile" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-sm bg-red waves-effect" id="saveButton">Save</button>
+    </div>
+}
+
+<script type="text/javascript">
+    document.getElementById('saveButton').addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent form submission until user confirmation
+
+        // Show confirmation dialog
+        var confirmSave = confirm("Do you want to save?");
+
+        if (confirmSave) {
+            // If OK clicked, show success message after form submission
+            document.getElementById('settleForm').submit(); // Submit the form
+            alert("Data successfully saved.");
+        } else {
+            // If Cancel clicked, do nothing and stay on the page
+            alert("Data not saved.");
+        }
+    });
+</script>

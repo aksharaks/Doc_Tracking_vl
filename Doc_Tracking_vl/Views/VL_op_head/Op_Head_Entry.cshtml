@@ -1,0 +1,184 @@
+﻿
+
+
+@model Doc_Tracking_vl.Models.Courier_entry
+
+@{
+    ViewBag.Title = "Op_Head_Entry";
+    Layout = "~/Views/Shared/VL_BH_Layout.cshtml";
+
+}
+
+
+
+<body class="theme-red">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>Transfer to HO</h2>
+                        </div>
+                        <div class="body">
+                            <!-- Check if ViewBag.Message is not null and display the message -->
+                            @if (!string.IsNullOrEmpty(ViewBag.Message))
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    @ViewBag.Message
+                                </div>
+                            }
+
+                            @using (Html.BeginForm("Submit_entry", "vl_op_head", FormMethod.Post, new { id = "searchForm" }))
+                            {
+                                <div class="row clearfix">
+                                    <div class="col-md-6">
+                                        @*<div class="form-group">
+            @Html.DropDownListFor(model => model.SelectedLoanNumber, Model.LoanNumbers, "Select Loan Number", new { @class = "form-control" })
+        </div>*@
+
+                                        <div class="form-group">
+
+                                            <!-- Use ListBoxFor to enable multiple selection -->
+                                            <label for="loan_number">Select Loan Numbers:</label>
+            @Html.ListBoxFor(model => model.SelectedLoanNumber, Model.LoanNumbers, new { @class = "form-control", multiple = "multiple", id = "loanNumbersList" })
+        </div>
+                                        </div>
+                                        @*<div class="col-md-6">
+            <div class="form-group">
+                @Html.DropDownListFor(model => model.SelectedDocType, Model.DocTypes, "Select Document", new { @class = "form-control" })
+            </div>
+        </div>*@
+                                    </div>
+
+                                <!-- Three textboxes in a single row -->
+                                <div class="row clearfix">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="courier_company_name">Courier Company Name</label>
+                                            <input type="text" id="courier_company_name" name="courier_company_name" class="form-control" style="border: 1px solid #ccc;padding: 5px;" required/>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="consignment_no">Consignment Number</label>
+                                            <input type="text" id="consignment_no" name="consignment_no" class="form-control" style="border: 1px solid #ccc; padding: 5px;"required />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="date_of_courier">Date of Courier</label>
+                                            <input type="date" id="date_of_courier" name="date_of_courier" class="form-control" style="border: 1px solid #ccc; padding: 5px;"required />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row clearfix">
+                                    <div class="col-md-6">
+                                        <input type="hidden" id="selectedLoanNumber" name="selectedLoanNumber" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="hidden" id="selectedDocType" name="selectedDocType" />
+                                    </div>
+                                </div>
+
+                                <div class="row clearfix">
+                                    <div class="col-md-6 search-btn-container">
+                                        <button type="button" class="btn btn-sm bg-red waves-effect" id="submitBtn">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="hidden" id="selectedLoanDocType" name="selectedLoanDocType" value="@ViewBag.LoanMode" />
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="~/Assets/js/admin.js"></script>
+    <script src="~/Assets/js/script.js"></script>
+   
+    
+    <script>
+        $(document).ready(function () {
+    $("#submitBtn").click(function (e) {
+        e.preventDefault(); // Prevent default form submission behavior
+
+        // Get values of the required fields
+        var courierCompanyName = $('#courier_company_name').val();
+        var consignmentNo = $('#consignment_no').val();
+        var dateOfCourier = $('#date_of_courier').val();
+
+        // Perform client-side validation
+        if (!courierCompanyName || !consignmentNo || !dateOfCourier) {
+            alert('Please fill in all required fields: Courier Company Name, Consignment Number, and Date of Courier.');
+            return false; // Stop the form submission
+        }
+
+        // If validation passes, proceed with the AJAX request
+        $.ajax({
+            url: '@Url.Action("Submit_entry", "VL_Op_Head")',
+            type: 'POST',
+            data: $('#searchForm').serialize(),
+            success: function (response) {
+                // Handle the response here
+                if (response.success) {
+                    alert(response.message);
+                    // Clear textboxes after successful submission
+                    $('#searchForm')[0].reset(); // Reset the form
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred while processing the request.');
+            }
+        });
+    });
+});
+
+    </script>
+    
+    
+    
+    
+    
+    
+    @*<script>
+      $(document).ready(function () {
+    $("#submitBtn").click(function (e) { // Pass 'e' for event
+        e.preventDefault(); // Prevent default form submission behavior
+        $.ajax({
+            url: '@Url.Action("Submit_entry", "VL_Op_Head")',
+            type: 'POST',
+            data: $('#searchForm').serialize(),
+            success: function (response) {
+                // Handle the response here
+                if (response.success) {
+                    alert(response.message);
+                    // Clear textboxes after successful submission
+                    $('#searchForm')[0].reset(); // Reset the form
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('An error occurred while processing the request.');
+            }
+        });
+    });
+});
+
+
+    </script>*@
+
+
+
+</body>

@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "Courier_Track_Rpt";
+    Layout = "~/Views/Shared/_Head_Office_Layout.cshtml";
+}
+
+
+<div class="container-fluid">
+    <div class="row mt-4">
+        <!-- Adjust top margin here -->
+        <!-- Sidebar Column -->
+        <div class="col-md-3">
+            <!-- Sidebar content (if needed) -->
+        </div>
+        <!-- Main Content Column -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="header" style="margin-top: 100px; padding-top: 30px;">
+                    <h2>Courier Tracking Report</h2>
+                </div>
+                <div style="margin-left: 75px;margin-bottom: 30px;">
+                    <form id="reportForm">
+                        <!-- First row -->
+                        <div class="row">
+                            <!-- First division -->
+                            <div class="col-md-4" style="margin-top:15px;">
+                                <div class="form-group">
+                                    <label for="startDate">Start Date:</label>
+                                    <input type="date" id="startDate" name="startDate" class="form-control" required>
+                                </div>
+                            </div>
+                            <!-- Second division -->
+                            <div class="col-md-4" style="margin-top:15px;">
+                                <div class="form-group">
+                                    <label for="endDate">End Date:</label>
+                                    <input type="date" id="endDate" name="endDate" class="form-control" required>
+                                </div>
+                            </div>
+                            <!-- Third division (button) -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-sm bg-red waves-effect" onclick="generateReport()" style="margin-top:40px;">Generate Report</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="reportContainer">
+                    <!-- Report table will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+   function generateReport() {
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+
+    if (startDate && endDate) {
+        $.ajax({
+            url: '@Url.Action("GenerateReport", "Reports_HO")',
+            type: 'POST',
+            data: { startDate: startDate, endDate: endDate },
+            success: function (response) {
+                $('#reportContainer').html(response);
+            },
+            error: function () {
+                alert('Error occurred while generating report.');
+            }
+        });
+    } else {
+        alert('Please select both start date and end date.');
+    }
+}
+</script>
+
+

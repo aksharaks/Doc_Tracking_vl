@@ -1,0 +1,85 @@
+﻿@{
+    bool[] completionStatus = ViewBag.CompletionStatus;
+    string loanId = ViewBag.LoanId;
+}
+<style>
+    .progress-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 5px;
+        margin-top: 50px;
+    }
+
+    .progress-segment {
+        text-align: center;
+    }
+
+        .progress-segment .stage {
+            font-weight: bold;
+        }
+
+        .progress-segment i {
+            color: #28a745; /* Color for completed stages */
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .progress-segment.completed {
+            color: #ff0000; /* Color for completed stages */
+        }
+</style>
+<div class="progress-bar">
+    <div class="progress-segment @(ViewBag.Maker != null ? "completed" : "")">
+        <div class="stage">SME Op Head</div>
+        @if (ViewBag.Maker != null)
+        {
+            <i class="fas fa-check-circle"></i>
+            <div>@ViewBag.Maker</div>
+            <div>@ViewBag.MakerDate</div>
+        }
+    </div>
+    <div class="progress-segment @(ViewBag.Checker1Vlbh != null ? "completed" : "")">
+        <div class="stage">SME BH</div>
+        @if (ViewBag.Checker1Vlbh != null)
+        {
+            <i class="fas fa-check-circle"></i>
+            <div>@ViewBag.Checker1Vlbh</div>
+            <div>@ViewBag.Checker1Date</div>
+        }
+    </div>
+    <div class="progress-segment @(ViewBag.Checker2Glabh != null ? "completed" : "")">
+        <div class="stage">GL ABH</div>
+        @if (ViewBag.Checker2Glabh != null)
+        {
+            <i class="fas fa-check-circle"></i>
+            <div>@ViewBag.Checker2Glabh</div>
+            <div>@ViewBag.Checker2Date</div>
+        }
+    </div>
+    <div class="progress-segment @(ViewBag.Checker3Glbh != null ? "completed" : "")">
+        <div class="stage">GL BH</div>
+        @if (ViewBag.Checker3Glbh != null)
+        {
+            <i class="fas fa-check-circle"></i>
+            <div>@ViewBag.Checker3Glbh</div>
+            <div>@ViewBag.Checker3Date</div>
+        }
+    </div>
+    <div class="progress-segment @(ViewBag.Checker4Ho != null ? "completed" : "")">
+        <div class="stage">Head Office</div>
+        @if (ViewBag.Checker4Ho != null)
+        {
+            <i class="fas fa-check-circle"></i>
+            <div>@ViewBag.Checker4Ho</div>
+            <div>@ViewBag.Checker4Date</div>
+        }
+    </div>
+</div>
+
+
+

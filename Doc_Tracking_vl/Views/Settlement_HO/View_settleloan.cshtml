@@ -1,0 +1,133 @@
+﻿
+
+@model List<Doc_Tracking_vl.Models.settle_loan_no>
+@{
+    ViewBag.Title = "View_settleloan";
+    Layout = "~/Views/Shared/_Head_Office_Layout.cshtml";
+}
+
+<!-- Content Area -->
+<div class="container-fluid">
+    <div class="row mt-4">
+        <!-- Adjust top margin here -->
+        <!-- Sidebar Column -->
+        <div class="col-md-3">
+            <!-- Sidebar content (if needed) -->
+        </div>
+        <!-- Main Content Column -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="header">
+                    <h2>Settled Loan Numbers</h2>
+                </div>
+                <div class="body">
+                    <table class="table" id="loanTable">
+                        <thead>
+                            <tr>
+                                <th>Loan Number</th>
+                                <th>Loan Branch Name</th>
+                                <th>Settle Branch Name</th>
+                                <th>Settlement Type</th>
+                                <th>Settle Status</th>
+                                <th>Settle Date</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.loan_number</td>
+                                    <td>@item.loan_branch_name</td>
+                                    <td>@item.settle_branch_name</td>
+                                    <td>@item.settlement_type</td>
+                                    <td>@item.settle_status</td>
+                                    <td>@item.settle_date.ToString("dd-MMM-yyyy")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <!-- Back Button -->
+                    <div class="text-center mt-4">
+                        <a href="@Url.Action("Settle_loan_doc", "Settlement_HO")" class="btn btn-sm bg-red waves-effect">Exit</a>
+                    </div>
+                </div>  
+            </div>
+            <!-- Pagination -->
+            <div class="text-center">
+                <ul class="pagination" id="loanPagination"></ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS for Content Area -->
+<style>
+    .row {
+        margin-top: 20px; /* Add top margin to the row containing content */
+    }
+
+    .card {
+        margin-top: 50px;
+        margin-bottom: 20px; /* Add spacing between elements */
+    }
+
+    .table {
+        width: 100%; /* Make table fill its container */
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        var itemsPerPage = 15;
+        var loanTable = $('#loanTable');
+        var loanTableBody = loanTable.find('tbody');
+        var totalPages = Math.ceil(loanTableBody.find('tr').length / itemsPerPage);
+        var currentPage = 1;
+
+        showPage(currentPage);
+
+        // Function to show specific page
+        function showPage(page) {
+            loanTableBody.find('tr').hide().slice((page - 1) * itemsPerPage, page * itemsPerPage).show();
+            currentPage = page;
+            renderPagination();
+        }
+
+        // Function to render pagination links
+        function renderPagination() {
+            $('#loanPagination').empty();
+            for (var i = 1; i <= totalPages; i++) {
+                $('#loanPagination').append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+            }
+            $('#loanPagination li').removeClass('active');
+            $('#loanPagination li:nth-child(' + currentPage + ')').addClass('active');
+        }
+
+        // Show the first page initially
+        renderPagination();
+
+        // Handle click on pagination links
+        $('#loanPagination').on('click', 'li.page-item', function () {
+            var page = $(this).text();
+            showPage(parseInt(page));
+        });
+
+        // Handle previous page button click
+        $('#loanPagination').prepend('<li class="page-item"><a class="page-link" href="#">Previous</a></li>');
+        $('#loanPagination').on('click', 'li:contains("Previous")', function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+
+        // Handle next page button click
+        $('#loanPagination').append('<li class="page-item"><a class="page-link" href="#">Next</a></li>');
+        $('#loanPagination').on('click', 'li:contains("Next")', function () {
+            if (currentPage < totalPages) {
+                showPage(currentPage + 1);
+            }
+        });
+    });
+</script>
+

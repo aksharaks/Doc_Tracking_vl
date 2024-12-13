@@ -1,0 +1,201 @@
+﻿@model Doc_Tracking_vl.Models.Checklist_Model
+
+<div class="row clearfix">
+    <div class="col-md-3">
+        <label for="loan_id">Loan Number:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">account_balance</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Loan Number" name="loan_id" id="loan_id" value="@TempData["loan_id"]" readonly>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <label for="customer_name">Customer Name:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">person</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Customer Name" name="customer_name" id="customer_name" value="@TempData["customer_name"]" readonly>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <label for="disbursed_amount">Disbursed Amount:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">attach_money</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Disbursed Amount" name="disbursed_amount" id="disbursed_amount" value="@TempData["disbursed_amount"]" readonly>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <label for="branch_name">Loan Date:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">event</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Disbursement Date" name="disbursement_date" id="disbursement_date" value="@TempData["loan_date"]" readonly>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row clearfix">
+        <div class="col-md-3">
+            <button type="button" class="btn btn-sm bg-red waves-effect" style="margin-left:10px" id="mortgageLoanButton">
+                <i class="material-icons"></i>
+                <span>vehicle Loan</span>
+            </button>
+        </div>
+        @*<div class="col-md-3">
+            <button type="button" class="btn btn-sm bg-red waves-effect" onclick="submitForm('Tranche')" id="trancheLoanButton">
+                <i class="material-icons"></i>
+                <span>Tranche Loan</span>
+            </button>
+        </div>*@
+    </div>
+
+
+    <!-- Add hidden fields to store selected options -->
+    <input type="hidden" id="selectedMortgageOption" name="selectedMortgageOption">
+    <input type="hidden" id="selectedLoanType" name="selectedLoanType">
+    <input type="hidden" id="selectedTrancheOption" name="selectedTrancheOption">
+
+    <!-- Add a hidden div with the radio buttons for Mortgage Loan -->
+    <div id="mortgageLoanOptions" style="display: none;">
+        <label>Choose Document:</label>
+        <div class="form-check">
+            @*<input type="radio" class="form-check-input" name="mortgage_option" id="property_docs" value="property_docs">
+            <label class="form-check-label" for="property_docs">Property Documents</label>*@
+            <input type="radio" class="form-check-input" name="mortgage_option" id="loan_docs" value="loan_docs">
+            <label class="form-check-label" for="loan_docs">Loan Documents</label>
+        </div>
+
+    </div>
+
+    <!-- Add a hidden div with the radio buttons for Mortgage Loan -->
+    @*<div id="mortgageLoanOptions1" style="display: none;">
+        <label>Choose Tranche Documents:</label>
+        <div class="form-check">
+            <input type="radio" class="form-check-input" name="tranche_option" id="property_docs1" value="property_docs1">
+            <label class="form-check-label" for="property_docs1">Property Documents</label>
+            <input type="radio" class="form-check-input" name="tranche_option" id="loan_docs1" value="loan_docs1">
+            <label class="form-check-label" for="loan_docs1">Loan Documents</label>
+        </div>*@
+
+    </div>
+    <!-- Add a div to display the partial view -->
+    <div id="mortgageChecklistPartial">
+
+    </div>
+
+
+    <!-- Your existing JavaScript code -->
+    <!-- Your existing JavaScript code -->
+    <script>
+    // Function to load the partial view
+function loadPartialView(selectedOption, url) {
+    // Make an AJAX request to the specified action
+    $.ajax({
+        url: url,
+        type: 'POST',
+        data: { selectedOption: selectedOption },
+        success: function (result) {
+            // Update the content of the mortgageChecklistPartial div with the result
+            $('#mortgageChecklistPartial').html(result);
+        },
+        error: function (xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            console.log(xhr.responseText); // Log the responseText to get more details
+        }
+    });
+}
+
+$(document).ready(function () {
+    // Event handler for Mortgage Loan button click
+    $('#mortgageLoanButton').click(function () {
+        // Show the hidden div with Mortgage Loan options
+        $('#mortgageLoanOptions').show();
+        // Hide Tranche Loan options
+        $('#mortgageLoanOptions1').hide();
+    });
+
+    // Event handler for Tranche Loan button click
+    $('#trancheLoanButton').click(function () {
+        // Show the hidden div with Tranche Loan options
+        $('#mortgageLoanOptions1').show();
+        // Hide Mortgage Loan options
+        $('#mortgageLoanOptions').hide();
+    });
+
+    // Event handler for radio button change in Mortgage Loan options
+    $('input[name="mortgage_option"]').change(function () {
+        var selectedOption = $('input[name="mortgage_option"]:checked').val();
+        // Store the selected option in hidden field
+        $('#selectedMortgageOption').val(selectedOption);
+
+        // Pass the URL to the script from the Razor view
+        //var url = '@Url.Action("Mortgage_Checklist", "Vl_operation_Head")';
+        var url1 = '@Url.Action("Mortgage_LoanDoc", "Vl_operation_Head")';
+
+        // Dynamically load different forms based on selected radio button
+        if (selectedOption === 'property_docs') {
+            loadPartialView(selectedOption, url);
+        } else if (selectedOption === 'loan_docs') {
+            loadPartialView(selectedOption, url1);
+            // Load a different partial view or form for loan_docs
+            // You can customize this based on your requirements
+            $('#mortgageChecklistPartial').html('<p>This is the loan_docs form.</p>');
+        }
+    });
+
+    // Event handler for radio button change in Tranche Loan options
+    $('input[name="tranche_option"]').change(function () {
+        var selectedOption = $('input[name="tranche_option"]:checked').val();
+        // Store the selected option in hidden field
+        $('#selectedTrancheOption').val(selectedOption);
+
+        // Pass the URL to the script from the Razor view
+        var url2 = '@Url.Action("Tranche_Checklist_Property", "SME_Operation_Head")';
+        var url3 = '@Url.Action("Tranche_LoanDoc", "SME_Operation_Head")';
+
+        // Dynamically load different forms based on selected radio button
+        if (selectedOption === 'property_docs1') {
+            loadPartialView(selectedOption, url2);
+        } else if (selectedOption === 'loan_docs1') {
+            loadPartialView(selectedOption, url3);
+            // Load a different partial view or form for loan_docs
+            // You can customize this based on your requirements
+            $('#mortgageChecklistPartial').html('<p>This is the loan_docs form.</p>');
+        }
+    });
+
+    function submitForm(loanType) {
+        // Set the loan type value before submitting the form
+        $('#loanType').val(loanType);
+
+        // Use a setTimeout to ensure that the selectedMortgageOption is updated
+        setTimeout(function () {
+            // Get the selected Mortgage option and store it in the hidden field
+            var selectedMortgageOption = $('#selectedMortgageOption').val();
+            $('#selectedLoanType').val(selectedMortgageOption);
+
+            // Get the selected Tranche option and store it in the hidden field
+            var selectedTrancheOption = $('#selectedTrancheOption').val();
+            // Submit the form
+            $('#checklistForm').submit();
+        }, 100); // Adjust the delay as needed
+    }
+});
+
+    </script>
+</div>

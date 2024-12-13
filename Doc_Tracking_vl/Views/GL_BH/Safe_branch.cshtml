@@ -1,0 +1,130 @@
+﻿
+
+
+@model Doc_Tracking_vl.Models.Checklist_Model_GL_BH
+@{
+    ViewBag.Title = "Safe_branch";
+    Layout = "~/Views/Shared/_GL_BH_Layout.cshtml";
+}
+
+<body class="theme-red">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>Agreements/Documents Received</h2>
+                        </div>
+                        <div class="body">
+                            @using (Html.BeginForm("search_no", "GL_BH", FormMethod.Post, new { id = "searchForm" }))
+                            {
+
+                                <div class="row clearfix">
+                                    <div class="col-md-6">
+                                        <div class="form-group col-md-3">
+                                            @Html.DropDownListFor(model => model.SelectedLoanNumber, Model.LoanNumbers, "Select Loan Number", new { @class = "form-control", style = "margin-left:5px;" })
+                                        </div>
+                                    </div>
+                                    <!-- Add a hidden input field to store the selected loan number -->
+                                    <input type="hidden" id="selectedLoanNumber" name="selectedLoanNumber" />
+                                    <div class="col-md-6">
+                                        <div class="form-group col-md-3">
+                                            @Html.DropDownListFor(model => model.SelectedDocType, Model.DocTypes, "Select Document", new { @class = "form-control", style = "margin-left:5px;" })
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="selectedDocType" name="selectedDocType" />
+                                    <!-- Add a hidden input field to store the selected loan document type -->
+                                    <input type="hidden" id="selectedLoanDocType" name="selectedLoanDocType" value="@ViewBag.LoanMode" />
+
+                                    <div class="col-md-6 search-btn-container">
+                                        <!-- Search button -->
+                                        <button type="submit" class="btn btn-sm bg-red waves-effect" id="searchBtn">
+
+                                            <span>Search</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <div id="partialViewContainer_bh_gl">
+                                <!-- The partial view will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="~/Assets/js/admin.js"></script>
+    <script src="~/Assets/js/script.js"></script>
+
+    <script>
+$(document).ready(function () {
+    // Attach change event to the SelectedLoanNumber dropdown
+    $("#SelectedLoanNumber").on("change", function () {
+        var selectedLoanNumber = $(this).val();
+
+        // Perform AJAX request to fetch the loan document type
+        $.ajax({
+            url: '@Url.Action("GetLoanDocType", "GL_BH")', // Replace YourControllerName with the actual name of your controller
+            type: 'GET',
+            data: { loanNumber: selectedLoanNumber },
+            success: function (result) {
+                // Set the fetched loan document type to the hidden field
+                $("#selectedLoanDocType").val(result);
+
+                // Optionally, update the UI or perform additional actions based on the result
+            },
+            error: function () {
+                alert("Error occurred while fetching loan document type.");
+            }
+        });
+    });
+
+    // Rest of your existing JavaScript code
+});
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Attach click event to the Verify button
+            $("#searchBtn").on("click", function (e) {
+                // Perform AJAX request to fetch partial view content
+                e.preventDefault(); // Prevent the form from submitting
+                // Check if loan number and document type are selected
+                if ($("#SelectedLoanNumber").val() === "" || $("#SelectedDocType").val() === "") {
+                    alert("Please select both loan number and document type.");
+                    return false; // Prevent form submission
+                }
+                // Set the value of the hidden input field
+                $("#selectedLoanNumber").val($("#SelectedLoanNumber").val());
+                $("#selectedDocType").val($("#SelectedDocType").val());
+                // Get the loanMode from the hidden field
+                var loanMode = $("#selectedLoanDocType").val();
+
+                $.ajax({
+                    url: '@Url.Action("Search_doc", "GL_BH")',
+                    type: 'POST',
+                    data: {
+                        selectedLoanNumber: $("#selectedLoanNumber").val(),
+                        selectedDocType: $("#selectedDocType").val(),
+                        loanMode: loanMode
+                    },
+                    success: function (result) {
+                        // Display partial view content in the container
+                        $("#partialViewContainer_bh_gl").html(result);
+                    },
+                    error: function () {
+                        alert("Error occurred while fetching data.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+
+

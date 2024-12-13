@@ -1,0 +1,154 @@
+﻿@model Doc_Tracking_vl.Models.Req_VL_BH
+<form id="savForm" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Loan Document ID</th>
+                <th>Loan Document Name</th>
+                <th>GL BH Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int serialNumber = 1; // Initialize serial number
+            }
+            <!-- Assuming you have PropertyDocsModel available in Checklist_Model_SME_BH -->
+            @if (Model != null && Model.LoanDocsReq_vl_bh != null && Model.LoanDocsReq_vl_bh.LoanDocs != null)
+            {
+                foreach (var question in Model.LoanDocsReq_vl_bh.LoanDocs)
+
+                {
+                    <tr class="filerow">
+                        <td>
+                            @serialNumber <!-- Display serial number -->
+                            <input type="hidden" data-loanDocId="@question.LoanDocId" />
+                        </td>
+                        @*<td>
+                                @question.LoanDocId
+                                <input type="hidden" data-loanDocId="@question.LoanDocId" />
+                            </td>*@
+                        <td>
+                            @question.LoanDocName
+                            <input type="hidden" data-loanDocName="@question.LoanDocName" />
+
+                        </td>
+                        <td>
+                            @if (question.IsChecked)
+                            {
+                                <text>Y</text>
+                                <input type="hidden" data-loanDocIsChecked="Y" />
+                            }
+                            else
+                            {
+                                <text>N</text>
+                                <input type="hidden" data-loanDocIsChecked="N" />
+                            }
+                        </td>
+                        <td>
+                            @question.Remarks
+                            <input type="hidden" data-loanDocRemarks="@question.Remarks" />
+
+                        </td>
+
+                    </tr>
+                    serialNumber++;
+                }
+            }
+            else
+            {
+                <p>No data available.</p>
+            }
+
+        </tbody>
+    </table>
+</form>
+<div class="col-md-3">
+    <button class="btn btn-sm bg-red waves-effect saveButton" id="saveButton" role="button" style="margin-top:-18px">
+        <i class="material-icons"></i>
+        <span>Save</span>
+    </button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+
+
+
+        let isSubmitting = false; // Track form submission status
+
+        $('.saveButton').click(function (event) {
+            // Prevent form submission if already submitting
+            if (isSubmitting) {
+                return false;
+            }
+
+            // Show confirmation dialog
+            var confirmation = confirm("Do you want to submit the data?");
+            if (!confirmation) {
+                event.preventDefault();  // Stop form submission
+                return false;
+            }
+
+            // Disable the button to prevent multiple submissions
+            isSubmitting = true;
+            $(this).prop('disabled', true);
+
+/*    $('.saveButton').click(function () {*/
+        var dataToSave = [];
+        // Retrieve the selected loan number from the hidden input field
+        var selectedLoanNumber = $("#selectedLoanNumber").val();
+        // Loop through each row to collect data
+        $('.filerow').each(function () { // Updated class to 'filerow'
+            var rowToSave = {};
+
+            // Retrieve the values from the data attributes
+            rowToSave.loanDocId = $(this).find('input[data-loanDocId]').attr('data-loanDocId');
+            rowToSave.loanDocName = $(this).find('input[data-loanDocName]').attr('data-loanDocName');
+
+            // Collect the value of the selected radio button
+            rowToSave.isChecked = $(this).find('input[data-loanDocIsChecked]').attr('data-loanDocIsChecked');
+
+            // Collect the value from the remark input field
+            rowToSave.remark = $(this).find('input[data-loanDocRemarks]').attr('data-loanDocRemarks');
+
+            dataToSave.push(rowToSave);
+        });
+         // Make an AJAX POST request to save the data
+        $.ajax({
+            url: '@Url.Action("Save_LoanReq_Mortgage_VL_BH", "Req_BH_VL")', // Update the URL to your controller action
+            type: 'POST',
+            data: JSON.stringify({
+                model: dataToSave,
+                selectedLoanNumber: $("#selectedLoanNumber").val(),
+                selectedDocType: $("#selectedDocType").val()// Retrieve selected loan number
+            }),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                // Check if the server response indicates success
+                if (response.success) {
+                    // Handle the success response, e.g., display a success message
+                    alert("Documents Requested to HO.");
+                    // Clear or hide the partial view
+                    $('#partialViewContainer_bh_sme_req').empty(); // Clears the content of the container
+                    // or
+                    // Additional handling if needed
+                } else {
+                    // Display the error message from the server response
+                    alert("Error saving data: " + response.message);
+                }
+            },
+            error: function (error) {
+                // Handle error if needed
+                console.error("AJAX error:", error);
+                alert("Error saving data. Please try again.");
+            }
+        });
+    });
+});
+</script>
+
+

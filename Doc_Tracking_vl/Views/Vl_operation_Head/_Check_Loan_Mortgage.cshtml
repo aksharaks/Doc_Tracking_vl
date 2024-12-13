@@ -1,0 +1,221 @@
+﻿
+@model Doc_Tracking_vl.Models.LoanDocModel_Mortgage
+
+
+
+
+<form id="savForm" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Loan Document ID</th>
+                <th>Loan Document Name</th>
+                <th>Is Checked</th>
+                <th>Remarks if any</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int serialNumber = 1; // Initialize serial number
+            }
+            @foreach (var question in Model.LoanDocs)
+
+            {
+                <tr class="filerow">
+                    <td>
+                        @serialNumber <!-- Display serial number -->
+                        <input type="hidden" data-loanDocId="@question.LoanDocId" />
+                    </td>
+                    @*<td>
+                            @question.LoanDocId
+                            <input type="hidden" data-loanDocId="@question.LoanDocId" />
+                        </td>*@
+                    <td>
+                        @question.LoanDocName
+                        <input type="hidden" data-loanDocName="@question.LoanDocName" />
+
+                    </td>
+                    <td>
+
+                        <div class="form-check form-check-inline">
+                            <input class=" = form-check-input" type="radio" name="LDYesNOToggle_@question.LoanDocId" id="LdYes_@question.LoanDocId" value="Y" required />
+                            <label class="form-check-label" for="LdYes_@question.LoanDocId"> Yes</label>
+                        </div>
+
+                        <div class="form-check form-check-inline">
+                            <input class=" = form-check-input" type="radio" name="LDYesNOToggle_@question.LoanDocId" id="LdNo_@question.LoanDocId" value="N" />
+                            <label class="form-check-label" for="LdNo_@question.LoanDocId"> No</label>
+                        </div>
+
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input class="form-control" type="text" id="remark_@question.LoanDocId" />
+
+                        </div>
+                    </td>
+                </tr>
+                serialNumber++;
+            }
+
+        </tbody>
+    </table>
+
+
+
+    <div class="col-md-3">
+        <button class="btn btn-sm bg-red waves-effect saveButton" id="saveButton" role="button">
+            <i class="material-icons"></i>
+            <span>Save</span>
+        </button>
+    </div>
+
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+@*<script>
+
+$(document).ready(function () {
+    $('.saveButton').click(function () {
+        var dataToSave = [];
+
+        // Loop through each row to collect data
+        $('.filerow').each(function () { // Updated class to 'filerow'
+            var rowToSave = {};
+
+            // Retrieve the data attributes from the hidden inputs
+            //rowToSave.propertyDocId = $(this).find('input[data-propertyDocId]').data('propertyDocId');
+            //rowToSave.propertyDocName = $(this).find('input[data-propertyDocName]').data('propertyDocName');
+
+
+            // Retrieve the values from the data attributes
+            rowToSave.loanDocId = $(this).find('input[data-loanDocId]').attr('data-loanDocId');
+            rowToSave.loanDocName = $(this).find('input[data-loanDocName]').attr('data-loanDocName');
+
+            // Collect the value of the selected radio button
+            rowToSave.isChecked = $(this).find('input[name^="LDYesNOToggle_"]:checked').val();
+
+            // Collect the value from the remark input field
+            rowToSave.remark = $(this).find('input[id^="remark_"]').val();
+
+            dataToSave.push(rowToSave);
+        });
+         // Make an AJAX POST request to save the data
+        $.ajax({
+            url: '@Url.Action("Save_Loan_Mortgage", "Vl_operation_Head")', // Update the URL to your controller action
+            type: 'POST',
+            data: JSON.stringify(dataToSave),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                // Check if the server response indicates success
+                if (response.success) {
+                    // Handle the success response, e.g., display a success message
+                    alert("Recommendation Completed.");
+                    // Clear the form or reset form elements
+                    $('.filerow input[name^="LDYesNOToggle_"]').prop('checked', false); // Uncheck radio buttons
+                    $('.filerow input[id^="remark_"]').val(''); // Clear remark input fields
+                    // Additional handling if needed
+                } else {
+                    // Display the error message from the server response
+                    alert("Error saving data: " + response.message);
+                }
+            },
+            error: function (error) {
+                // Handle error if needed
+                console.error("AJAX error:", error);
+                alert("Error saving data. Please try again.");
+            }
+        });
+    });
+});
+</script>*@
+@*//-----------------------------------------------------*@
+<script>
+$(document).ready(function () {
+    let isSubmitting = false; // Track form submission status
+
+    $('.saveButton').click(function (event) {
+        // Prevent form submission if already submitting
+        if (isSubmitting) {
+            return false;
+        }
+
+        // Show confirmation dialog
+        var confirmation = confirm("Do you want to submit the data?");
+        if (!confirmation) {
+            event.preventDefault();  // Stop form submission
+            return false;
+        }
+
+        // Disable the button to prevent multiple submissions
+        isSubmitting = true;
+        $(this).prop('disabled', true);
+
+        var dataToSave = [];
+
+        // Loop through each row to collect data
+        $('.filerow').each(function () {
+            var rowToSave = {};
+
+            rowToSave.loanDocId = $(this).find('input[data-loanDocId]').attr('data-loanDocId');
+            rowToSave.loanDocName = $(this).find('input[data-loanDocName]').attr('data-loanDocName');
+            rowToSave.isChecked = $(this).find('input[name^="LDYesNOToggle_"]:checked').val();
+            rowToSave.remark = $(this).find('input[id^="remark_"]').val();
+
+            dataToSave.push(rowToSave);
+        });
+
+        // Make an AJAX POST request to save the data
+        $.ajax({
+            url: '@Url.Action("Save_Loan_Mortgage", "Vl_operation_Head")',
+            type: 'POST',
+            data: JSON.stringify(dataToSave),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    alert("Recommendation Completed.");
+                    $('.filerow input[name^="LDYesNOToggle_"]').prop('checked', false);
+                    $('.filerow input[id^="remark_"]').val('');
+                } else {
+                    alert("Error saving data: " + response.message);
+                }
+                isSubmitting = false;  // Reset the submission flag
+                $('#saveButton').prop('disabled', false);  // Re-enable the button
+            },
+            error: function (error) {
+                console.error("AJAX error:", error);
+                alert("Error saving data. Please try again.");
+                isSubmitting = false;  // Reset the submission flag
+                $('#saveButton').prop('disabled', false);  // Re-enable the button
+            }
+        });
+    });
+});
+</script>
+
+
+<script>
+    document.getElementById('saveButton').addEventListener('click', function (event) {
+        let formValid = true;
+        let unAnswered = false;  // To track if any questions are unanswered
+
+        // Check each row to ensure one of the radio buttons is checked
+        document.querySelectorAll('.filerow').forEach(function (row) {
+            let radios = row.querySelectorAll('input[type="radio"]');
+            let checked = Array.from(radios).some(radio => radio.checked);
+
+            if (!checked) {
+                unAnswered = true;
+            }
+        });
+
+        // If any question is unanswered, show the alert and prevent form submission
+        if (unAnswered) {
+            event.preventDefault();  // Prevent form submission
+            alert("Please answer all questions before submitting.");
+            return false;  // Stop further execution
+        }
+    });
+</script>

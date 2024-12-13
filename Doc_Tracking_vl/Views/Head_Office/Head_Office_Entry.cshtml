@@ -1,0 +1,247 @@
+﻿
+
+@model Doc_Tracking_vl.Models.HO_entry
+@{
+    ViewBag.Title = "Head_Office_Entry";
+    Layout = "~/Views/Shared/_Head_Office_Layout.cshtml";
+}
+
+<body class="theme-red">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>Agreements/Documents Received</h2>
+                        </div>
+                        <div class="body">
+                            <!-- Check if ViewBag.Message is not null and display the message -->
+                            @if (!string.IsNullOrEmpty(ViewBag.Message))
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    @ViewBag.Message
+                                </div>
+                            }
+
+                            @using (Html.BeginForm("Head_Office_Entry", "Head_Office", FormMethod.Post, new { id = "searchForm" }))
+                            {
+                                <div class="row clearfix">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.DropDownListFor(model => model.SelectedLoanNumber, Model.LoanNumbers, "Select Loan Number", new { @class = "form-control", onchange = "this.form.submit();" })
+                                        </div>
+                                    </div>
+                                    <!-- Add a hidden input field to store the selected loan number -->
+                                    <input type="hidden" id="selectedLoanNumber" name="selectedLoanNumber" />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.DropDownListFor(model => model.SelectedDocType, Model.DocTypes, "Select Document", new { @class = "form-control", onchange = "this.form.submit();" })
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="selectedDocType" name="selectedDocType" />
+                                    <!-- Add a hidden input field to store the selected loan document type -->
+                                    <input type="hidden" id="selectedLoanDocType" name="selectedLoanDocType" value="@ViewBag.LoanMode" />
+                                </div>
+
+                                <!-- Three textboxes in a single row -->
+                                <div class="row clearfix">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="courier_company_name">Courier Company Name</label>
+                                            @Html.TextBoxFor(model => model.courier_company_name, new { @class = "form-control", style = "border: 1px solid #ccc; padding: 5px;", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="consignment_no">Consignment Number</label>
+                                            @Html.TextBoxFor(model => model.consignment_no, new { @class = "form-control", style = "border: 1px solid #ccc; padding: 5px;", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="date_of_courier">Date of Courier</label>
+                                            @Html.TextBoxFor(model => model.date_of_courier, "{0:dd-MMM-yyyy}", new { @class = "form-control", style = "border: 1px solid #ccc; padding: 5px;", @readonly = "readonly" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="date_of_receival">Date of Receival</label>
+                                            <input type="date" id="date_of_receival" name="date_of_receival" class="form-control" style="border: 1px solid #ccc; padding: 5px;" />
+                                        </div>
+                                    </div>
+                                    <div class="row clearfix">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-sm bg-red waves-effect" id="submitBtn" style="margin-left:15px;">
+                                                <span>Submit</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm bg-red waves-effect" id="viewBtn" style="display: none;">
+                                                <span>View Documents</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            }
+                            <div id="partialViewContainer_ho">
+                                <!-- The partial view will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Include jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="~/Assets/js/admin.js"></script>
+    <script src="~/Assets/js/script.js"></script>
+    <script>
+        $(document).ready(function () {
+            // If the selected document type is not null, set it in the dropdown
+            var selectedDocType = "@ViewBag.SelectedDocType";
+            if (selectedDocType) {
+                $("#SelectedDocType").val(selectedDocType);
+            }
+        });
+    </script>
+    @*<script>
+              $(document).ready(function () {
+            $("#submitBtn").click(function (e) { // Pass 'e' for event
+                e.preventDefault(); // Prevent default form submission behavior
+                $.ajax({
+                    url: '@Url.Action("Submit_entry", "Head_Office")',
+                    type: 'POST',
+                    data: $('#searchForm').serialize(),
+                    success: function (response) {
+                        // Handle the response here
+                        if (response.success) {
+                            alert(response.message);
+                            // Clear textboxes after successful submission
+                            $('#searchForm')[0].reset(); // Reset the form
+                            // Hide the Submit button and show the View Documents button
+                            $("#submitBtn").hide();
+                            $("#viewBtn").show();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while processing the request.');
+                    }
+                });
+            });
+        });
+
+
+            </script>*@
+
+<script>
+
+    $(document).ready(function () {
+    $("#submitBtn").click(function (e) {
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Get the value of the "Date of Receival" input field
+    var dateOfReceival = $("#date_of_receival").val();
+
+    // Check if "Date of Receival" is empty
+    if (!dateOfReceival) {
+    alert("Please fill in the Date of Receival.");
+    return; // Stop the submission process if the field is empty
+    }
+
+    // If the date is filled, proceed with the AJAX request
+    $.ajax({
+    url: '@Url.Action("Submit_entry", "Head_Office")',
+    type: 'POST',
+    data: $('#searchForm').serialize(),
+    success: function (response) {
+    // Handle the response here
+    if (response.success) {
+    alert(response.message);
+    // Clear textboxes after successful submission
+        $('#searchForm')[0].reset(); // Reset the form
+
+        // Manually clear specific fields
+        $("#courier_company_name").val('');
+        $("#date_of_receival").val('');
+        $("#date_of_courier").val('');
+        $("#consignment_no").val('');
+
+
+
+    // Hide the Submit button and show the View Documents button
+    $("#submitBtn").hide();
+    $("#viewBtn").show();
+    } else {
+    alert(response.message);
+    }
+    },
+    error: function () {
+    alert('An error occurred while processing the request.');
+    }
+    });
+    });
+    });
+</script>
+
+    <script>
+ $(document).ready(function () {
+     // Attach change event to the SelectedLoanNumber dropdown
+     $("#SelectedLoanNumber").on("change", function () {
+         var selectedLoanNumber = $(this).val();
+
+         // Perform AJAX request to fetch the loan document type
+         $.ajax({
+             url: '@Url.Action("GetLoanDocType", "Head_Office")', // Replace YourControllerName with the actual name of your controller
+             type: 'GET',
+             data: { loanNumber: selectedLoanNumber },
+             success: function (result) {
+                 // Set the fetched loanxxxxxx document type to the hidden field
+                 $("#selectedLoanDocType").val(result);
+
+                 // Optionally, update the UI or perform additional actions based on the result
+             },
+             error: function () {
+                 alert("Error occurred while fetching loan document type.");
+             }
+         });
+     });
+
+     // Rest of your existing JavaScript code
+ });
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        // Attach click event to the Verify button
+        $("#viewBtn").on("click", function (e) {
+            // Perform AJAX request to fetch partial view content
+            e.preventDefault(); // Prevent the form from submitting
+            // Set the value of the hidden input field
+            $("#selectedLoanNumber").val($("#SelectedLoanNumber").val());
+            $("#selectedDocType").val($("#SelectedDocType").val());
+            // Get the loanMode from the hidden field
+        var loanMode = $("#selectedLoanDocType").val();
+            $.ajax({
+                url: '@Url.Action("View_docs", "Head_Office")',
+                type: 'POST',
+                data: {
+                    selectedLoanNumber: $("#selectedLoanNumber").val(),
+                    selectedDocType: $("#selectedDocType").val(),
+                    loanMode: loanMode
+                },
+                success: function (result) {
+                    // Display partial view content in the container
+                    $("#partialViewContainer_ho").html(result);
+                },
+                error: function () {
+                    alert("Error occurred while fetching data.");
+                }
+            });
+        });
+    });
+    </script>
+</body>

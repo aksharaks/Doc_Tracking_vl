@@ -1,0 +1,333 @@
+﻿@model Doc_Tracking_vl.Models.Checklist_Model
+
+@{
+    ViewBag.Title = "Checklist_OpHead";
+    Layout = "~/Views/Shared/VL_BH_Layout.cshtml";
+
+}
+
+
+<head>
+    <style>
+        .input-group-addon {
+            margin: 0; /* Set margin to zero */
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .search-btn-container {
+            margin-top: 5px;
+        }
+    </style>
+
+
+</head>
+<body class="theme-red">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row clearfix">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <div class="card">
+                        <div class="header">
+                            <h2>Agreements/Documents Received</h2>
+                        </div>
+                        <div class="body">
+                            @using (Html.BeginForm("search_no", "Vl_operation_Head", FormMethod.Post, new { id = "searchForm" }))
+                            {
+                                <div class="row clearfix">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="branch_name">State:</label>
+                                            @Html.DropDownListFor(model => model.SelectedState, Model.States, "Select State", new { @class = "form-control", style = "margin-left:5px;", id = "stateDropdown" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="branch_name">Branch Name:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <i class="material-icons">business</i>
+                                                </span>
+                                                <div class="form-line">
+                                                    <input type="text" class="form-control" placeholder="Branch Name" name="branch_name" id="branch_name" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="type_of_loan">Type of Loan:</label>
+                                            @Html.DropDownListFor(model => model.SelectedLoanType, new SelectList(new[]
+                                            {
+                                                new SelectListItem { Value = "43", Text = "vehicle Loan" },
+                                                //new SelectListItem { Value = "51", Text = "Unsecured Loan" }
+
+                                            }, "Value", "Text"), "Select Loan Type", new { @class = "form-control", style = "margin-left:5px;", id = "loanTypeDropdown" })
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row clearfix">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="loan_number">Loan Number:</label>
+                                            @Html.DropDownListFor(model => model.SelectedLoanNumber, Model.LoanNumbers, "Select Loan Number", new { @class = "form-control", style = "margin-left:5px;", id = "loanNumberDropdown" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 search-btn-container">
+                                        <!-- Search button -->
+                                        <button type="submit" class="btn btn-sm bg-red waves-effect" style="margin-top:13px">
+                                            <i class="material-icons">search</i>
+                                            <span>Search</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+
+                            <div id="partialViewContainer">
+                                <!-- The partial view will be inserted here -->
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="~/Assets/js/admin.js"></script>
+        <script src="~/Assets/js/script.js"></script>
+        <script>
+            $("#checklistForm").submit(function () {
+                // Iterate through checkboxes and update hidden fields
+                $("[name='checklistItems[]']").each(function () {
+                    var index = $(this).data("index");
+                    var isChecked = $(this).prop("checked");
+
+                    // Update the corresponding hidden field
+                    $("[name='checklistItemsIsChecked[" + index + "]']").val(isChecked.toString());
+                });
+            });
+
+        </script>
+
+        <script>
+        $(document).ready(function () {
+            $("#stateDropdown").change(function () {
+                var selectedStateId = $(this).val();
+                $.ajax({
+                    url:'@Url.Action("GetBranches", "Vl_operation_Head")',
+                    type: "POST",
+                    data: { stateId: selectedStateId },
+                    dataType: "json",
+                    success: function (data) {
+
+
+                        // Assuming data contains only one branch for simplicity
+                        if (data.length > 0) {
+                            var branchName = data[0].Text;
+                            $("#branch_name").val(branchName);  // Update the textbox value
+                        }
+                        // Show the loan section after updating the branch name
+                        $("#loanSection").show();
+                    },
+                    error: function (error) {
+                        console.log("Error fetching branches:", error);
+                    }
+                });
+            });
+        });
+        </script>
+
+        <script>
+        $(document).ready(function () {
+            $("#loanTypeDropdown").change(function () {
+                var selectedState = $("#stateDropdown").val();
+                var selectedLoanType = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("GetLoanNumbers", "Vl_operation_Head")',
+                    type: "POST",
+                    data: { stateId: selectedState, loanType: selectedLoanType },
+                    dataType: "json",
+                    success: function (data) {
+                        var loanNumberDropdown = $("#loanNumberDropdown");
+                        loanNumberDropdown.empty(); // Clear existing options
+
+                        if (data.length > 0) {
+                            // Iterate over the JSON data and update the dropdown
+                            $.each(data, function (index, item) {
+                                loanNumberDropdown.append('<option value="' + item.Value + '">' + item.Text + '</option>');
+                            });
+                        } else {
+                            // Handle the case when no loan numbers are available
+                            loanNumberDropdown.append('<option value="">No loan numbers available</option>');
+                        }
+                    },
+                    error: function (error) {
+                        console.log("Error fetching loan numbers:", error);
+                    }
+                });
+            });
+
+
+        });
+        </script>
+
+        <script>
+        $(document).ready(function () {
+            $("#searchForm").submit(function (e) {
+                e.preventDefault(); // Prevent the form from submitting
+                // Check if loan type and state dropdowns are selected
+                if ($("#loanTypeDropdown").val() === "" || $("#stateDropdown").val() === "") {
+                    // Display a validation message
+                    alert("Please select both loan type and state.");
+
+                    // Exit the function to prevent further execution
+                    return false;
+                }
+                // Your other form submission logic here
+
+                // Perform AJAX call to fetch and render the partial view
+                $.ajax({
+                    url: '@Url.Action("search_no", "Vl_operation_Head")',
+                    type: 'POST',
+                    data: $(this).serialize(), // Serialize the form data
+                    success: function (response) {
+                        $('#partialViewContainer').html(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("XHR object:", xhr);
+                        console.log("Status:", status);
+                        console.log("Error:", error);
+                    }
+                });
+            });
+        });
+        </script>
+
+        @*<script>
+$(document).ready(function () {
+    var isSubmitting = false; // Track submission state
+
+    $('.saveButton').click(function () {
+        if (isSubmitting) {
+            alert("Form is already being submitted. Please wait.");
+            return false; // Prevent duplicate submissions
+        }
+
+        var isValid = true; // Flag to track validation
+
+        // Loop through each row to validate
+        $('.filerow').each(function () {
+            var loanDocId = $(this).find('input[data-loanDocId]').attr('data-loanDocId');
+            var radioChecked = $(this).find('input[name="LDYesNOToggle_' + loanDocId + '"]:checked').length > 0; // Check if Yes/No is selected
+
+            // If radio is not selected, mark as invalid
+            if (!radioChecked) {
+                isValid = false;
+                return false; // Break the each loop
+            }
+        });
+
+        if (!isValid) {
+            // Display a validation message if any document is incomplete
+            alert("Please verify all documents by selecting an option (Yes/No) for each document.");
+            return false; // Prevent form submission
+        }
+
+        // If the form is valid, proceed with AJAX submission
+        var dataToSave = [];
+
+        $('.filerow').each(function () {
+            var rowToSave = {};
+            rowToSave.loanDocId = $(this).find('input[data-loanDocId]').attr('data-loanDocId');
+            rowToSave.loanDocName = $(this).find('input[data-loanDocName]').attr('data-loanDocName');
+            rowToSave.isChecked = $(this).find('input[name^="LDYesNOToggle_"]:checked').val();
+            rowToSave.remark = $(this).find('input[id^="remark_"]').val(); // Optional remark field
+
+            dataToSave.push(rowToSave);
+        });
+
+        // Disable the save button to prevent double-clicks and show submitting text
+        isSubmitting = true; // Set submitting state
+        var $saveButton = $('.saveButton');
+        $saveButton.prop('disabled', true).text('Submitting...');
+
+        // Make an AJAX POST request to save the data
+        $.ajax({
+            url: '@Url.Action("Save_Loan_Mortgage", "Vl_operation_Head")',
+            type: 'POST',
+            data: JSON.stringify(dataToSave),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    alert("Recommendation Completed.");
+                    $('.filerow input[name^="LDYesNOToggle_"]').prop('checked', false); // Uncheck radio buttons
+                    $('.filerow input[id^="remark_"]').val(''); // Clear remark input fields
+                } else {
+                    alert("Error saving data: " + response.message);
+                }
+            },
+            error: function (error) {
+                console.error("AJAX error:", error);
+                alert("Error saving data. Please try again.");
+            },
+            complete: function () {
+                // Reset the submitting state and button after submission is complete
+                isSubmitting = false;
+                $saveButton.prop('disabled', false).text('Save');
+            }
+        });
+    });
+});
+        </script>*@
+
+
+
+
+    </section>
+
+    @if (TempData["Message"] != null)
+    {
+        <script type="text/javascript">
+        window.onload = function () {
+            alert("@TempData["Message"]");
+        };
+        </script>
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>

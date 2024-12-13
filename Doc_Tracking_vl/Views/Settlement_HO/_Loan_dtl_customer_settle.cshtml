@@ -1,0 +1,96 @@
+﻿<div class="row clearfix">
+    <div class="col-md-4">
+        <label for="loan_id">Loan Number:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">account_balance</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Loan Number" name="loan_id" id="loan_id" value="@TempData["loan_id"]" readonly>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <label for="customer_name">Customer Name:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">person</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Customer Name" name="customer_name" id="customer_name" value="@TempData["customer_name"]" readonly>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <label for="branch_name">Branch Name:</label>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="material-icons">attach_money</i>
+            </span>
+            <div class="form-line">
+                <input type="text" class="form-control" placeholder="Branch Name" name="branch_name" id="branch_name" value="@TempData["branch_name"]" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row clearfix">
+
+    <!-- Your existing code for loan details -->
+    <div class="col-md-4">
+        <label for="settle_type">Settlement Type:</label>
+        <!-- Dropdown for Settlement Type -->
+        <select class="form-control" id="settleTypeDropdown">
+            @foreach (var item in ViewBag.SettleTypes)
+            {
+                <option value="@item.Value" data-text="@item.Text">@item.Text</option>
+            }
+        </select>
+
+    </div>
+
+
+
+    <div class="col-md-4">
+        <button type="button" class="btn btn-sm bg-red waves-effect" style="margin-top:25px" onclick="fetchDetails()">Fetch Details</button>
+    </div>
+</div>
+
+<div id="partialViewContainer">
+
+</div>
+<script>
+    function fetchDetails() {
+    // Gather all the necessary details
+    var loanId = $("#loan_id").val();
+    var customerId = $("#customer_name").val();
+    var branchId = $("#branch_name").val();
+    var signedBy = $("#applicantTypeDropdown").val();
+    var settlementTypeValue = $("#settleTypeDropdown").val();
+    var settlementTypeText = $("#settleTypeDropdown option:selected").data("text");
+    var idType = $("#idTypeDropdown").val();
+
+    // Make an AJAX request to send the details to the controller
+    $.ajax({
+        url: '@Url.Action("FetchDetails", "Settlement_HO")',
+        type: 'POST',
+        data: {
+            loanId: loanId,
+            customerId: customerId,
+            branchId: branchId,
+            signedBy: signedBy,
+            settlementTypeValue: settlementTypeValue,
+            settlementTypeText: settlementTypeText,
+            idType: idType
+        },
+        success: function (result) {
+            // Display partial view content in the container
+            $("#partialViewContainer").html(result);
+        },
+        error: function () {
+            alert("Error occurred while fetching details.");
+        }
+    });
+}
+
+</script>
